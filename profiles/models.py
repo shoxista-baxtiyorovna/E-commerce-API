@@ -7,3 +7,5 @@ class UserProfile(models.Model):
     is_premium = models.BooleanField(default=True)
     phone = models.CharField(max_length=100, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
+
+    def __str__(self):
