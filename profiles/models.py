@@ -9,3 +9,4 @@ class UserProfile(models.Model):
     address = models.TextField(null=True, blank=True)
 
     def __str__(self):
+        return self.user
