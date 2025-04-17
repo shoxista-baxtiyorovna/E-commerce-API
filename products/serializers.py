@@ -1,11 +1,12 @@
 from rest_framework import serializers
+from categories.models import Category
 from .models import Product
 
 
-class ProductCategorySerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(read_only=True)
-    description = serializers.CharField(read_only=True)
+class ProductCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'description']
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -23,10 +24,20 @@ class ProductSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
 
-        def to_representation(self, instance):
-            data = super().to_representation(instance)
-            data['category'] = ProductCategorySerializer(instance.category).data
-            return data
 
+class ProductDetailSerializer(serializers.ModelSerializer):
+    category = ProductCategorySerializer()
 
-        
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'name',
+            'description',
+            'price',
+            'category',
+            'in_stock',
+            'quantity',
+            'created_at',
+            'updated_at'
+        ]
