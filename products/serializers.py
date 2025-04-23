@@ -20,8 +20,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'category',
             'in_stock',
             'quantity',
-            'created_at',
-            'updated_at'
         ]
 
 
