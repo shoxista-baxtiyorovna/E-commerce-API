@@ -4,12 +4,6 @@ from .models import Cart, CartItem
 from products.models import Product
 
 
-#
-# class CartProductSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Product
-#         fields = ['id', 'name', 'price']
-
 
 class CartItemSerializer(serializers.ModelSerializer):
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
@@ -38,5 +32,3 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ['id', 'user', 'items', 'total_price', 'created_at', 'updated_at']
 
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import status, generics
-from rest_framework_simplejwt.tokens import RefreshToken
+# from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -22,14 +22,14 @@ class UserRegistrationView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(username=request.data['username'])
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
+        # refresh = RefreshToken.for_user(user)
+        # access_token = str(refresh.access_token)
+        # refresh_token = str(refresh)
         return Response({
             'id': user.id,
             'username': user.username,
             'email': user.email,
             'is_premium': user.is_premium,
-            'access': access_token,
-            'refresh': refresh_token
+            # 'access': access_token,
+            # 'refresh': refresh_token
         }, status=status.HTTP_201_CREATED)
