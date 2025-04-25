@@ -1,3 +1,5 @@
+from os import access
+
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
@@ -26,11 +28,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
-        data['user_id'] = user.id
-        data['username'] = user.username
-        data['is_premium'] = user.profile.is_premium
-        data['token'] = data.pop('access')  # Rename 'access' token to 'token'
-
-        return data
+        access_token = self.get_token(user)
+        return {
+        "token": str(access_token),
+        "user_id": user.id,
+        "username": user.username,
+        "is_premium": user.profile.is_premium,
+        }
 
 
