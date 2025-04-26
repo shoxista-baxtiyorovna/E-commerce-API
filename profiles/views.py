@@ -1,11 +1,10 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import logout
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import OutstandingToken
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
 
 
@@ -34,5 +33,11 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        logout(request)  # This will end the session and clear the session cookie
-        return Response({"detail": "Successfully logged out."})
+        try:
+            # Get the token from the Authorization header
+            token = request.auth  # This is the JWT token sent in the Authorization header
+            # Blacklist the token to invalidate it
+            OutstandingToken.objects.filter(token=token).update(blacklisted=True)
+            return Response({"detail": "Successfully logged out."}, status=200)
+        except Exception as e:
+            return Response({"detail": "Failed to log out."}, status=400)
