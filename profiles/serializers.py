@@ -26,9 +26,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
-        access_token = self.get_token(user)
+        refresh = self.get_token(user)
         return {
-        "token": str(access_token),
+        "token": str(refresh.access_token),
         "user_id": user.id,
         "username": user.username,
         "is_premium": user.profile.is_premium,

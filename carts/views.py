@@ -1,16 +1,15 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
 from .serializers import CartItemSerializer, CartSerializer
-from .models import Cart, CartItem
+from .models import Cart
 
 
-class ListView(generics.ListAPIView):
+class CartListView(generics.ListAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
 
 
-class CreateView(generics.CreateAPIView):
+class AddToCartView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
 
     def create(self, request, *args, **kwargs):
