@@ -1,7 +1,6 @@
-from rest_framework import generics, status
-from rest_framework.response import Response
-from .serializer import OrderSerializer, OrderItemSerializer
-from .models import Order, OrderItem
+from rest_framework import generics
+from .serializers import OrderSerializer, ProductOrderSerializer
+from .models import Order
 
 
 class OrderView(generics.ListAPIView):
@@ -10,23 +9,7 @@ class OrderView(generics.ListAPIView):
 
 
 class OrderCreateView(generics.CreateAPIView):
-    serializer_class = OrderItemSerializer
+    queryset = Order.objects.all()
+    serializer_class = ProductOrderSerializer
 
-    def create(self, request, *args, **kwargs):
-        user = request.user
-        order = Order.objects.filter(user=user).first()
-
-        if not order:
-            return Response(
-                {"detail": "Order not found for the user."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            order_item = serializer.save(cart=order)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

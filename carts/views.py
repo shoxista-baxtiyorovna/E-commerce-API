@@ -12,20 +12,6 @@ class CartListView(generics.ListAPIView):
 class AddToCartView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
 
-    def create(self, request, *args, **kwargs):
-        user = request.user
-        cart = Cart.objects.filter(user=user).first()
-
-        if not cart:
-            return Response(
-                {"detail": "Cart not found for the user."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            cart_item = serializer.save(cart=cart)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        cart, _ = Cart.objects.get_or_create(user=self.request.user)
+        serializer.save(cart=cart)

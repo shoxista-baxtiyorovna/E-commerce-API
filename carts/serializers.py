@@ -1,24 +1,52 @@
-from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Cart, CartItem
+from rest_framework import serializers
+from .models import Cart, CartItem, Product
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    product_id = serializers.IntegerField(write_only=True)
+    total_price = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity', 'total_price']
+        fields = ['id', 'product_id', 'quantity', 'total_price']
+
+    def validate_product_id(self, value):
+        if not Product.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Product not found.")
+        return value
+
+    def create(self, validated_data):
+        cart = validated_data['cart']
+        product_id = validated_data.pop('product_id')
+        quantity = validated_data.pop('quantity')
+        product = Product.objects.get(id=product_id)
+
+        try:
+            cart_item = CartItem.objects.get(cart=cart, product=product)
+            cart_item.quantity += quantity
+            cart_item.save()
+        except CartItem.DoesNotExist:
+            cart_item = CartItem.objects.create(
+                cart=cart,
+                product=product,
+                quantity=quantity
+            )
+
+        return cart_item
+
+    def get_total_price(self, obj):
+        return obj.product.price * obj.quantity
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        product = instance.product
         representation['product'] = {
-            'id': product.id,
-            'name': product.name,
-            'price': product.price
+            'id': instance.product.id,
+            'name': instance.product.name,
+            'price': instance.product.price
         }
         return representation
+
 
 
 class CartSerializer(serializers.ModelSerializer):

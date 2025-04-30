@@ -39,12 +39,19 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def total_price(self):
+        return sum(item.total_price for item in self.items.all())
+
+
+
+
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='items')
     price = models.DecimalField(max_digits=8, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
     @property
     def total_price(self):
-        return sum(order.total_price for order in(self.product.price * self.quantity))
+        return self.product.price * self.quantity
