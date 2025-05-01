@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.permissions import AllowAny
 from rest_framework import status, generics
 from rest_framework.views import APIView
@@ -12,6 +13,7 @@ class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [AnonRateThrottle]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -27,9 +29,11 @@ class UserRegistrationView(generics.CreateAPIView):
 
 class CustomLogInView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
+    throttle_classes = [AnonRateThrottle]
 
 class LogoutView(APIView):
+    # throttle_classes = [UserRateThrottle]
+
     def post(self, request):
         token = RefreshToken(request.data.get('refresh'))
         token.blacklist()
