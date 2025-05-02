@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'categories',
     'carts',
     'orders',
-    'products.apps.ProductsConfig',
-    'categories.apps.CategoriesConfig',
 ]
 
 REST_FRAMEWORK = {
@@ -61,18 +59,18 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_THROTTLE_RATES': {
-        'user': '1000/day',  # Authenticated users
-        'anon': '10/hour',# Unauthenticated users
-        'premium': '200/min',# Premium users
+        'user': '4/day',  # Authenticated users
+        'anon': '2/hour',# Unauthenticated users
+        'premium': '3/min',# Premium users
         'products-search': '10/min',
         'orders-create': '2/min',
     }
 }
 
 CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": BASE_DIR / "django_cache",  # joylashuvni siz belgilaysiz
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
     }
 }
 
