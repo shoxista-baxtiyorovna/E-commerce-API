@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'categories',
     'carts',
     'orders',
+    'products.apps.ProductsConfig',
+    'categories.apps.CategoriesConfig',
 ]
 
 REST_FRAMEWORK = {
@@ -55,11 +57,13 @@ REST_FRAMEWORK = {
 
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',
+        'profiles.throttling.PremiumUserThrottle',
     ],
 
     'DEFAULT_THROTTLE_RATES': {
         'user': '1000/day',  # Authenticated users
         'anon': '10/hour',# Unauthenticated users
+        'premium': '200/min',# Premium users
         'products-search': '10/min',
         'orders-create': '2/min',
     }
