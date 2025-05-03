@@ -55,22 +55,25 @@ REST_FRAMEWORK = {
 
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',
-        'profiles.throttling.PremiumUserThrottle',
+        'common.throttling.PremiumUserRateThrottle',
     ],
 
     'DEFAULT_THROTTLE_RATES': {
-        'user': '4/day',  # Authenticated users
-        'anon': '2/hour',# Unauthenticated users
-        'premium': '3/min',# Premium users
-        'products-search': '10/min',
+        'user': '3/day',  # Authenticated users
+        'anon': '3/hour',# Unauthenticated users
+        'premium': '5/min',# Premium users
+        'products-search': '2/min',
         'orders-create': '2/min',
     }
 }
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # Redisning URL manzili
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
     }
 }
 

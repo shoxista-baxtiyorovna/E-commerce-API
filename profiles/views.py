@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from common.throttling import PremiumUserRateThrottle
 from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
-from .throttling import PremiumUserThrottle
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -34,14 +34,11 @@ class CustomLogInView(TokenObtainPairView):
 
 class LogoutView(APIView):
     def get_throttles(self):
-        user = self.request.user
-
-        # Bu yerda user har doim authenticated bo'lishi kafolatlangan
-        is_premium = getattr(getattr(user, 'profile', None), 'is_premium', False)
-
-        if is_premium:
-            return [PremiumUserThrottle()]
-        return [UserRateThrottle()]
+        if self.request.user.is_authenticated and self.request.user.profile.is_premium:
+            throttle_classes = [PremiumUserRateThrottle]
+        else:
+            throttle_classes = [UserRateThrottle]
+        return [throttle() for throttle in throttle_classes]
 
     def post(self, request):
         token = RefreshToken(request.data.get('refresh'))
